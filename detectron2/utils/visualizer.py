@@ -380,7 +380,7 @@ class Visualizer:
         self._instance_mode = instance_mode
         self.keypoint_threshold = _KEYPOINT_THRESHOLD
 
-    def draw_instance_predictions(self, predictions):
+    def draw_instance_predictions(self, predictions, alpha_value=None):
         """
         Draw instance-level prediction results on an image.
 
@@ -423,14 +423,31 @@ class Visualizer:
             )
             alpha = 0.3
 
-        self.overlay_instances(
-            masks=masks,
-            boxes=boxes,
-            labels=labels,
-            keypoints=keypoints,
-            assigned_colors=colors,
-            alpha=alpha,
-        )
+        if alpha_value is not None:
+            alpha = alpha_value
+            # If you want a red mask for all instances of all classes, use this:
+            # colors = [_RED for _ in range(len(labels))]
+            # If you want a different colored mask for all instances of a specific class, use this:
+            colors = [[x / 255 for x in self.metadata.thing_colors[c]] for c in classes]
+
+            self.overlay_instances(
+                masks=masks,
+                # boxes=boxes,
+                # labels=labels,
+                keypoints=keypoints,
+                assigned_colors=colors,
+                alpha=alpha,
+            )
+        else:
+            self.overlay_instances(
+                masks=masks,
+                boxes=boxes,
+                labels=labels,
+                keypoints=keypoints,
+                assigned_colors=colors,
+                alpha=alpha,
+            )
+            
         return self.output
 
     def draw_sem_seg(self, sem_seg, area_threshold=None, alpha=0.8):
